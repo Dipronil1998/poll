@@ -19,11 +19,11 @@
                 {% csrf_token %}
                 {% for fm in form %}
                     <div class="form-group">
-                        <label>{{fm.label_tag}}</label>
+                        {{fm.label_tag}}
                         {{fm}}
                     </div>   
                 {% endfor %}
-                <button type="submit" class="btn btn-primary">Change Password</button>
+                <button type="submit" class="btn btn-primary">Update Profile</button>
             </form>
         </div>
     </div>

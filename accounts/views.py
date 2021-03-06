@@ -1,10 +1,10 @@
 from django.http import HttpResponse
 from django.shortcuts import render,redirect
-from django.contrib.auth.forms import UserCreationForm
-from .forms import UserRegistrationForm
+from django.contrib.auth.forms import UserCreationForm,PasswordChangeForm
+from .forms import UserRegistrationForm,EditProfileForm
 from django.contrib import messages
 from django.contrib.auth.models import User
-from django.contrib.auth import authenticate, login, logout
+from django.contrib.auth import authenticate, login, logout,update_session_auth_hash
 
 
 def login_user(request):
@@ -18,8 +18,6 @@ def login_user(request):
 
             if user is not None:
                 login(request, user)
-                #redirect_url = request.GET.get('next', 'home')
-                #return redirect(redirect_url)
                 return redirect('home')
             else:
                 messages.error(request, "Username Or Password is incorrect!!",
@@ -83,5 +81,37 @@ def create_user(request):
 
 
 def changepassword(request):
-    context={}
+    if request.method == 'POST':
+        form=PasswordChangeForm(user=request.user, data=request.POST)
+        if form.is_valid():
+            form.save()
+            update_session_auth_hash(request,form.user)
+            messages.success(
+                    request, "Password changed successfully", extra_tags='alert alert-success alert-dismissible fade show')
+            logout(request)
+            return redirect('accounts:login')
+        else:
+            messages.error(
+                        request, "Password is not change", extra_tags='alert alert-warning alert-dismissible fade show')
+            return redirect('accounts:changepassword')
+    else:
+         form=PasswordChangeForm(user=request.user)
+    context={'form':form}
     return render(request,'accounts/changepassword.html',context)
+
+
+
+def profile(request):
+    if request.user.is_authenticated:
+        if request.method == 'POST':
+            form=EditProfileForm(request.POST,instance=request.user) 
+            if form.is_valid():
+                messages.success(
+                    request, "Profile saved successfully", extra_tags='alert alert-success alert-dismissible fade show')
+                form.save()
+        else:   
+            form=EditProfileForm(instance=request.user)
+        context={'form':form}
+        return render(request,'accounts/profile.html',context)
+
+
