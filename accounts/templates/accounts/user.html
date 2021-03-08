@@ -4,6 +4,17 @@
 <div class="container">
     <div class="row">
         <div class="col-md-8 offset-sm-2">
+          {% if messages %}
+            <div class="messages">
+                {% for message in messages %}
+                <div {% if message.tags %} class="{{ message.tags }}" {% endif %} id="msg">{{ message }}
+                    <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                {% endfor %}
+            </div>
+            {% endif %}
             <!--form class="form-inline mt-3 mb-3">
                 <div class="form-group mr-sm-2 mb-2">
                     <input type="search" class="form-control" name="search" placeholder="Search" value="{{ search_term }}">
@@ -19,6 +30,7 @@
                     <th scope="col">Staff status</th>
                     <th scope="col">Superuser status</th>
                     <th scope="col">Edit</th>
+                    <th scope="col">Delete</th>
                   </tr>
                 </thead>
                 {% for user in users %}
@@ -30,6 +42,7 @@
                     <td>{{user.is_staff}}</td>
                     <td>{{user.is_superuser}}</td>
                     <td><a href="{% url 'accounts:userdetails' user.id %}">Edit</a></td>
+                    <td><a href="{% url 'accounts:delete_user' user.id %}" role="button" onclick="return confirm('Are you sure?')">Delete</a></td>
                   </tr>
                 </tbody>
                 {% endfor %}

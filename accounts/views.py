@@ -1,10 +1,11 @@
 from django.http import HttpResponse
-from django.shortcuts import render,redirect
+from django.shortcuts import render,redirect,get_object_or_404
 from django.contrib.auth.forms import UserCreationForm,PasswordChangeForm
 from .forms import UserRegistrationForm,EditProfileForm,EditAdminProfileForm
 from django.contrib import messages
 from django.contrib.auth.models import User
 from django.contrib.auth import authenticate, login, logout,update_session_auth_hash
+from django.contrib.auth.decorators import login_required
 
 
 def login_user(request):
@@ -79,7 +80,7 @@ def create_user(request):
         return render(request,'accounts/register.html',context)
 
 
-
+@login_required()
 def changepassword(request):
     if request.method == 'POST':
         form=PasswordChangeForm(user=request.user, data=request.POST)
@@ -105,7 +106,7 @@ def contact(request):
     return render(request,'accounts/contactus.html',context)
 
 
-#EditAdminProfileForm
+@login_required()
 def profile(request):
     if request.user.is_authenticated:
         if request.method == 'POST':
@@ -129,17 +130,31 @@ def profile(request):
         context={'form':form, 'users':users}
         return render(request,'accounts/profile.html',context)
 
-
+@login_required()
 def user(request):
     users= User.objects.all()
     context={'users':users}
     return render(request,'accounts/user.html',context)
 
 
+@login_required()
 def userdetails(request, id):
     p=User.objects.get(pk=id)
-    form=EditAdminProfileForm(instance=p) 
+    form=EditAdminProfileForm(instance=p)
+    if request.method == 'POST':
+        form=EditAdminProfileForm(request.POST,instance=p)
+        if form.is_valid():
+            messages.success(
+                request, "Profile saved successfully", extra_tags='alert alert-success alert-dismissible fade show')
+            form.save()
     context={'form':form}
     return render(request,'accounts/userdetails.html',context)
 
 
+@login_required()
+def delete_user(request, id):
+    user = get_object_or_404(User, pk=id)
+    user.delete()
+    messages.success(request, "User Deleted successfully",
+                     extra_tags='alert alert-success alert-dismissible fade show')
+    return redirect("accounts:user.html")
