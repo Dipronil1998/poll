@@ -1,0 +1,41 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="container">
+    <div class="row">
+        <div class="col-md-8 offset-sm-2">
+            <!--form class="form-inline mt-3 mb-3">
+                <div class="form-group mr-sm-2 mb-2">
+                    <input type="search" class="form-control" name="search" placeholder="Search" value="{{ search_term }}">
+                </div>
+                <button type="submit" class="btn btn-primary mb-2"><i class="fas fa-search"></i></button>
+            </form-->
+            <table class="table">
+                <thead>
+                  <tr>
+                    <th scope="col">Username</th>
+                    <th scope="col">Email</th>
+                    <th scope="col">Active</th>
+                    <th scope="col">Staff status</th>
+                    <th scope="col">Superuser status</th>
+                    <th scope="col">Edit</th>
+                  </tr>
+                </thead>
+                {% for user in users %}
+                <tbody>
+                  <tr>
+                    <td>{{user.username}}</td>
+                    <td>{{user.email}}</td>
+                    <td>{{user.is_active}}</td>
+                    <td>{{user.is_staff}}</td>
+                    <td>{{user.is_superuser}}</td>
+                    <td><a href="{% url 'accounts:userdetails' user.id %}">Edit</a></td>
+                  </tr>
+                </tbody>
+                {% endfor %}
+              </table>
+        </div>
+    </div>
+</div>
+
+{% endblock %}

@@ -1,7 +1,7 @@
 from django.http import HttpResponse
 from django.shortcuts import render,redirect
 from django.contrib.auth.forms import UserCreationForm,PasswordChangeForm
-from .forms import UserRegistrationForm,EditProfileForm
+from .forms import UserRegistrationForm,EditProfileForm,EditAdminProfileForm
 from django.contrib import messages
 from django.contrib.auth.models import User
 from django.contrib.auth import authenticate, login, logout,update_session_auth_hash
@@ -100,18 +100,46 @@ def changepassword(request):
     return render(request,'accounts/changepassword.html',context)
 
 
+def contact(request):
+    context={}
+    return render(request,'accounts/contactus.html',context)
 
+
+#EditAdminProfileForm
 def profile(request):
     if request.user.is_authenticated:
         if request.method == 'POST':
-            form=EditProfileForm(request.POST,instance=request.user) 
+            if request.user.is_superuser == True:
+                form=EditAdminProfileForm(request.POST,instance=request.user)
+                users= User.objects.all()
+            else:
+                form=EditProfileForm(request.POST,instance=request.user) 
+                users= None
             if form.is_valid():
                 messages.success(
                     request, "Profile saved successfully", extra_tags='alert alert-success alert-dismissible fade show')
                 form.save()
-        else:   
-            form=EditProfileForm(instance=request.user)
-        context={'form':form}
+        else:
+            if request.user.is_superuser == True:
+                form=EditAdminProfileForm(instance=request.user) 
+                users= User.objects.all()
+            else:
+                form=EditProfileForm(instance=request.user)
+                users= None
+        context={'form':form, 'users':users}
         return render(request,'accounts/profile.html',context)
+
+
+def user(request):
+    users= User.objects.all()
+    context={'users':users}
+    return render(request,'accounts/user.html',context)
+
+
+def userdetails(request, id):
+    p=User.objects.get(pk=id)
+    form=EditAdminProfileForm(instance=p) 
+    context={'form':form}
+    return render(request,'accounts/userdetails.html',context)
 
 

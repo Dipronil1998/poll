@@ -17,19 +17,15 @@
             {% endif %}
             <form action="" method="POST">
                 {% csrf_token %}
-                <div class="form-group">
-                    <label>Username</label>
-                    <input type="text" class="form-control" name="username" placeholder="Enter Username">
-                </div>
-                <div class="form-group">
-                    <label>Password</label>
-                    <input type="password" class="form-control" name="password" placeholder="Enter Password">
-                </div>
-                <button type="submit" class="btn btn-primary">Login</button>
-                <p>Need an account? <a href="{% url 'accounts:register' %}">Register Here</a></p>
-                <p><a href="{% url 'accounts:password_reset' %}">Forgot Password </a></p>
+                {% for fm in form %}
+                    <div class="form-group">
+                        {{fm.label_tag}}
+                        {{fm}}
+                    </div>   
+                {% endfor %}
+                <button type="submit" class="btn btn-primary">Update Profile</button>
+                <a class="btn btn-danger" href="{% url 'accounts:user' %}" role="button">Back</a>
             </form>
-            
         </div>
     </div>
 </div>

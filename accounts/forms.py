@@ -19,12 +19,12 @@ class EditProfileForm(UserChangeForm):
     class Meta:
         model=User
         fields=['username','first_name','last_name','email','date_joined','last_login']
-        #labels={'email':Email}
-
+        labels={'email':'Email'}
+        '''
         def __init__(self, *args, **kwargs): 
             super(EditProfileForm, self).__init__(*args, **kwargs)                       
             self.fields['username'].disabled = True
-            
+        ''' 
 '''
         def __init__(self,*args,**kwargs):
             super(EditProfileForm,self).__init__(*args, **kwargs)
@@ -33,6 +33,14 @@ class EditProfileForm(UserChangeForm):
             #self.fields['username'].widget.attrs['disabled'] = "disabled"
             # self.fields['username'].widget.attrs['readonly'] = "readonly" 
 '''     
-        
-        
+
+class EditAdminProfileForm(UserChangeForm):
+    password=None
+    class Meta:
+        model=User
+        #fields= '__all__'
+        #exclude={'groups','user_permissions'}
+        fields=['username','first_name','last_name','email','date_joined','last_login','is_active','is_staff','is_superuser']
+        labels={'email':'Email'}
+    
         
