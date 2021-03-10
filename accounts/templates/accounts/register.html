@@ -4,7 +4,7 @@
 <div class="container">
     <div class="row center">
         <div class="col-md-6 offset-md-3">
-            <p>Already have an account? <a href="{% url 'accounts:login' %}">Login Here</a></p>
+            
             {% if messages %}
             <div class="messages">
                 {% for message in messages %}
@@ -16,11 +16,28 @@
                 {% endfor %}
             </div>
             {% endif %}
-            <form action="" method="POST">
-                {% csrf_token %}
-                {{ form.as_p }}
-                <button type="submit" class="btn btn-primary">Sign Up</button>
-            </form>
+
+            {% if otp %} 
+                <form action="" method="POST">
+                    {% csrf_token %}
+                    <input type="hidden" name="usr" value="{{usr.username}}">
+                    <div class="input-group mb-3">
+                        <div class="input-group-prepend">
+                          <span class="input-group-text" id="basic-addon1">OTP</span>
+                        </div>
+                        <input type="text" class="form-control" placeholder="Please Enter OTP" aria-label="OTP" aria-describedby="basic-addon1" name="otp">
+                        <button type="submit" class="btn btn-primary">Verify</button>
+                        <p><a href="{% url 'accounts:login' %}"><i id="resendOTP">Resend</i>  OTP</a></p>
+                      </div>   
+                </form>
+            {% else %}
+                <form action="" method="POST">
+                    {% csrf_token %}
+                    {{ form.as_p }}
+                    <button type="submit" class="btn btn-primary">Sign Up</button>
+                    <p>Already have an account? <a href="{% url 'accounts:login' %}">Login Here</a></p>
+                </form>
+            {% endif %}
         </div>
     </div>
 </div>

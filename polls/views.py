@@ -53,7 +53,8 @@ def polls_add(request):
         context = {'form':form}
         return render(request, 'polls/add_poll.html', context)
     else:
-        return HttpResponse("Sorry but you don't have permission to do that!")
+        return render(request, 'polls/403.html')
+        #return HttpResponse("Sorry but you don't have permission to do that!")
 
     
 
@@ -85,6 +86,9 @@ def poll_detail(request,poll_id):
 @login_required
 def polls_edit(request, poll_id):
     poll = get_object_or_404(Poll, pk=poll_id)
+    if request.user != poll.owner:
+        return redirect('home')
+
     if request.method == 'POST':
         form = EditPollForm(request.POST, instance=poll)
         if form.is_valid:

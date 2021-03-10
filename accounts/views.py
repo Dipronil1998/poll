@@ -6,6 +6,10 @@ from django.contrib import messages
 from django.contrib.auth.models import User
 from django.contrib.auth import authenticate, login, logout,update_session_auth_hash
 from django.contrib.auth.decorators import login_required
+import random
+from .models import UserOTP
+from django.core.mail import send_mail
+from django.conf import settings
 
 
 def login_user(request):
@@ -41,6 +45,21 @@ def create_user(request):
             check1 = False
             check2 = False
             check3 = False
+            get_otp=request.POST.get('otp')
+            if get_otp:
+                get_usr=request.POST.get('usr')
+                usr=User.objects.get(username=get_usr)
+                if int(get_otp) == UserOTP.objects.filter(user=usr).last().otp:
+                    usr.is_active=True
+                    usr.save()
+                    messages.success(
+                        request, f'Thanks for registering {usr.username}!', extra_tags='alert alert-success alert-dismissible fade show')
+                    return redirect('accounts:login')
+                else:
+                    messages.error(request, 'OTP doesn\'t matched',
+                            extra_tags='alert alert-warning alert-dismissible fade show')
+                    return render(request,'accounts/register.html',{'otp':True, 'usr':usr})   
+
             form = UserRegistrationForm(request.POST)
             if form.is_valid():
                 username = form.cleaned_data['username']
@@ -68,11 +87,23 @@ def create_user(request):
                         request, "Registration Failed", extra_tags='alert alert-warning alert-dismissible fade show')
                     return redirect('accounts:register')
                 else:
-                    user = User.objects.create_user(
-                        username=username, password=password1, email=email)
-                    messages.success(
-                        request, f'Thanks for registering {user.username}!', extra_tags='alert alert-success alert-dismissible fade show')
-                    return redirect('accounts:login')
+                    user = User.objects.create_user(username=username, password=password1, email=email)
+                    user.is_active=False
+                    user.save()
+                    user_otp=random.randint(100000,999999)
+                    UserOTP.objects.create(user=user, otp=user_otp)
+                    mess= f'Hello {user.username},\nYour OTP is: {user_otp}'
+                    send_mail(
+                        "Verify Your Email",
+                        mess,
+                        settings.EMAIL_HOST_USER,
+                        [user.email],
+                        fail_silently=False
+                    )
+                    return render(request,'accounts/register.html',{'otp':True, 'usr':user})
+                    #messages.success(
+                    #    request, f'Thanks for registering {user.username}!', extra_tags='alert alert-success alert-dismissible fade show')
+                    #return redirect('accounts:login')
                 
         else:
             form = UserRegistrationForm()
@@ -157,4 +188,6 @@ def delete_user(request, id):
     user.delete()
     messages.success(request, "User Deleted successfully",
                      extra_tags='alert alert-success alert-dismissible fade show')
-    return redirect("accounts:user.html")
+    users= User.objects.all()
+    context={'users':users}
+    return render(request,'accounts/user.html',context)
