@@ -30,10 +30,11 @@ def polls_list(request):
     return render(request, 'polls/polls_list.html', context)
 
 
-
+#
 @login_required()
 def polls_add(request):
-    if request.user.has_perm('polls.add_poll'):
+    #if request.user.has_perm('polls.add_poll'):
+    if request.user.is_superuser == True or request.user.is_staff == True:
         if request.method == 'POST':
             form = PollAddForm(request.POST)
             if form.is_valid:

@@ -133,7 +133,8 @@ def changepassword(request):
 
 
 def contact(request):
-    context={}
+    users= User.objects.all()
+    context={'users':users}
     return render(request,'accounts/contactus.html',context)
 
 
@@ -191,3 +192,23 @@ def delete_user(request, id):
     users= User.objects.all()
     context={'users':users}
     return render(request,'accounts/user.html',context)
+
+
+def resendOTP(request):
+    if request.method == 'GET':
+        get_usr=request.GET['usr']
+        if User.objects.filter(username=get_usr).exists() and not User.objects.get(username=get_usr).is_active:
+            user=User.objects.get(username=get_usr)
+            user_otp=random.randint(100000,999999)
+            UserOTP.objects.create(user=user, otp=user_otp)
+            mess= f'Hello {user.username},\nYour OTP is: {user_otp}'
+            send_mail(
+                "Verify Your Email",
+                mess,
+                settings.EMAIL_HOST_USER,
+                [user.email],
+                fail_silently=False
+            )
+            return HttpResponse("Resend")
+
+    return HttpResponse("Can't Send")

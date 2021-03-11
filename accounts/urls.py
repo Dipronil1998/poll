@@ -15,6 +15,7 @@ urlpatterns=[
     path('user/', views.user, name='user'),
     path('userdetails/<int:id>', views.userdetails, name='userdetails'),
     path('delete_user/<int:id>', views.delete_user, name='delete_user'),
+    path('resendOTP/',views.resendOTP,name='resendOTP'),
 
 
     path('password_reset/',

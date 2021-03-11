@@ -8,10 +8,10 @@ class UserRegistrationForm(forms.Form):
                                widget=forms.TextInput(attrs={'class': 'form-control'}))
     email = forms.EmailField(label='Email', max_length=50, min_length=5,
                              widget=forms.EmailInput(attrs={'class': 'form-control'}))
-    password1 = forms.CharField(label='Password', max_length=50, min_length=5,
+    password1 = forms.CharField(label='Password', max_length=50, min_length=8,
                                 widget=forms.PasswordInput(attrs={'class': 'form-control'}))
     password2 = forms.CharField(label='Confirm Password',
-                                max_length=50, min_length=5,
+                                max_length=50, min_length=8,
                                 widget=forms.PasswordInput(attrs={'class': 'form-control'}))
 
 class EditProfileForm(UserChangeForm):

@@ -42,7 +42,9 @@
                     <td>{{user.is_staff}}</td>
                     <td>{{user.is_superuser}}</td>
                     <td><a href="{% url 'accounts:userdetails' user.id %}">Edit</a></td>
+                    {% if request.user.is_superuser %}
                     <td><a href="{% url 'accounts:delete_user' user.id %}" role="button" onclick="return confirm('Are you sure?')">Delete</a></td>
+                    {% endif %}
                   </tr>
                 </tbody>
                 {% endfor %}
